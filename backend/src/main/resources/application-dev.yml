@@ -1,0 +1,6 @@
+# Optional profile: enable when calling the API directly from a browser on :5173 (without Vite proxy).
+# Run: .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
+spring:
+  config:
+    activate:
+      on-profile: dev
