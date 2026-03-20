@@ -29,6 +29,8 @@ Spring Boot 后端 + Vue 3 前端。设计见 [`docs/plans/2026-03-20-library-ma
 
 浏览器打开 `http://localhost:5173`。接口路径统一为 `/api/...`。
 
+Axios 实例见 `frontend/src/api/http.ts`（`baseURL: '/api'`，从 `localStorage` 键 `library.jwt` 附带 `Authorization: Bearer`；登录态将由后续 Pinia store 写入同一键）。
+
 ## 单进程运行（Spring 托管 Vue 构建产物）
 
 1. 安装 Node 后，在仓库根目录执行 **`cd frontend && npm install && npm run build`**（输出目录为 `backend/src/main/resources/static`，受 `frontend/vite.config.ts` 中 `build.outDir` 约束）。
