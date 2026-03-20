@@ -2,8 +2,10 @@ package com.library.app.repository;
 
 import com.library.app.domain.User;
 import com.library.app.domain.Role;
+import com.library.app.domain.ReaderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -13,4 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	boolean existsByUsername(String username);
 
 	boolean existsByRole(Role role);
+
+	List<User> findByRoleAndReaderStatusOrderByIdAsc(Role role, ReaderStatus readerStatus);
 }
