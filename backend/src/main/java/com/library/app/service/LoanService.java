@@ -6,6 +6,7 @@ import com.library.app.domain.Loan;
 import com.library.app.domain.ReaderStatus;
 import com.library.app.domain.Role;
 import com.library.app.domain.User;
+import com.library.app.dto.AdminLoanResponse;
 import com.library.app.dto.LoanResponse;
 import com.library.app.repository.BookRepository;
 import com.library.app.repository.LoanRepository;
@@ -78,6 +79,47 @@ public class LoanService {
 				.toList();
 	}
 
+	/**
+	 * Reader returns their copy; second call is a no-op on inventory (idempotent).
+	 */
+	@Transactional
+	public LoanResponse returnLoan(Long loanId) {
+		User current = loadCurrentUser();
+		if (current.getRole() != Role.READER) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "ONLY_READERS_MAY_RETURN");
+		}
+
+		Loan loan = loanRepository.findByIdForReturn(loanId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "LOAN_NOT_FOUND"));
+
+		if (!loan.getReader().getId().equals(current.getId())) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "NOT_YOUR_LOAN");
+		}
+
+		if (loan.getReturnedAt() != null) {
+			return toResponse(loan);
+		}
+
+		LocalDateTime returnedAt = LocalDateTime.now();
+		loan.setReturnedAt(returnedAt);
+
+		Book book = bookRepository.findByIdForUpdate(loan.getBook().getId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "BOOK_NOT_FOUND"));
+		book.setAvailableCopies(Math.min(book.getTotalCopies(), book.getAvailableCopies() + 1));
+
+		loanRepository.save(loan);
+		bookRepository.save(book);
+
+		return toResponse(loan);
+	}
+
+	@Transactional(readOnly = true)
+	public List<AdminLoanResponse> listAllLoansForAdmin() {
+		return loanRepository.findAllWithReaderAndBookOrderByBorrowedAtDesc().stream()
+				.map(this::toAdminResponse)
+				.toList();
+	}
+
 	private User loadCurrentUser() {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		return userRepository.findByUsername(username)
@@ -88,6 +130,19 @@ public class LoanService {
 		Book book = loan.getBook();
 		return new LoanResponse(
 				loan.getId(),
+				book.getId(),
+				book.getTitle(),
+				book.getAuthor(),
+				loan.getBorrowedAt(),
+				loan.getDueAt(),
+				loan.getReturnedAt());
+	}
+
+	private AdminLoanResponse toAdminResponse(Loan loan) {
+		Book book = loan.getBook();
+		return new AdminLoanResponse(
+				loan.getId(),
+				loan.getReader().getUsername(),
 				book.getId(),
 				book.getTitle(),
 				book.getAuthor(),
