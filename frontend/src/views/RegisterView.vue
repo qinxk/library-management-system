@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { http } from '../api/http'
+import { apiErrorMessage } from '../api/errors'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
@@ -23,8 +24,8 @@ async function submit() {
     auth.setSession(data.token)
     await auth.fetchMe()
     await router.replace('/books')
-  } catch {
-    error.value = '注册失败：用户名可能已被占用，或不符合规则（用户名≥3 字符，密码≥6）。'
+  } catch (e) {
+    error.value = apiErrorMessage(e, '注册失败：用户名可能已被占用，或不符合规则。')
   } finally {
     submitting.value = false
   }

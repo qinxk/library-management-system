@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { http } from '../api/http'
+import { apiErrorMessage } from '../api/errors'
 import { useAuthStore } from '../stores/auth'
 import type { Book } from '../types/book'
 
@@ -23,8 +24,8 @@ async function load() {
   try {
     const { data } = await http.get<Book>(`/books/${bookId.value}`)
     book.value = data
-  } catch {
-    err.value = '图书不存在或加载失败。'
+  } catch (e) {
+    err.value = apiErrorMessage(e, '图书不存在或加载失败。')
     book.value = null
   } finally {
     loading.value = false
@@ -38,8 +39,8 @@ async function borrow() {
     await http.post('/loans', { bookId: bookId.value })
     actionMsg.value = '借阅成功。'
     await load()
-  } catch {
-    actionMsg.value = '借阅失败（可能无库存、未通过审核或已达借阅上限）。'
+  } catch (e) {
+    actionMsg.value = apiErrorMessage(e, '借阅失败')
   } finally {
     borrowing.value = false
   }

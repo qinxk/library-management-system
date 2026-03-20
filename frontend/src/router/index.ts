@@ -43,17 +43,17 @@ const router = createRouter({
         {
           path: 'books',
           name: 'admin-books',
-          component: () => import('../views/admin/AdminBooksView.vue'),
+          component: () => import('../views/admin/BookManageView.vue'),
         },
         {
           path: 'readers',
           name: 'admin-readers',
-          component: () => import('../views/admin/AdminReadersView.vue'),
+          component: () => import('../views/admin/PendingReadersView.vue'),
         },
         {
           path: 'loans',
           name: 'admin-loans',
-          component: () => import('../views/admin/AdminLoansView.vue'),
+          component: () => import('../views/admin/AllLoansView.vue'),
         },
       ],
     },
@@ -80,7 +80,7 @@ router.beforeEach(async (to) => {
       }
     }
     if (auth.token && auth.user) {
-      return { path: '/books' }
+      return auth.isAdmin ? { path: '/admin' } : { path: '/books' }
     }
     return true
   }

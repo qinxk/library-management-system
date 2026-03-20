@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { http } from '../api/http'
+import { apiErrorMessage } from '../api/errors'
 import { useAuthStore } from '../stores/auth'
 import type { Loan } from '../types/loan'
 
@@ -15,8 +16,8 @@ async function load() {
   try {
     const { data } = await http.get<Loan[]>('/me/loans')
     loans.value = data
-  } catch {
-    err.value = '无法加载借阅记录。'
+  } catch (e) {
+    err.value = apiErrorMessage(e, '无法加载借阅记录。')
     loans.value = []
   } finally {
     loading.value = false
@@ -27,8 +28,8 @@ async function returnBook(loanId: number) {
   try {
     await http.post(`/loans/${loanId}/return`)
     await load()
-  } catch {
-    err.value = '还书失败。'
+  } catch (e) {
+    err.value = apiErrorMessage(e, '还书失败。')
   }
 }
 

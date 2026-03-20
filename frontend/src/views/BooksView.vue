@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { http } from '../api/http'
+import { apiErrorMessage } from '../api/errors'
+import { useAuthStore } from '../stores/auth'
 import type { PageBook } from '../types/book'
+
+const auth = useAuthStore()
 
 const keyword = ref('')
 const page = ref(0)
@@ -22,8 +26,8 @@ async function load() {
       },
     })
     data.value = body
-  } catch {
-    err.value = '加载目录失败。'
+  } catch (e) {
+    err.value = apiErrorMessage(e, '加载目录失败。')
     data.value = null
   } finally {
     loading.value = false
@@ -46,6 +50,9 @@ onMounted(load)
 <template>
   <div class="page">
     <h1>馆藏目录</h1>
+    <p v-if="auth.isReader && auth.readerStatus === 'PENDING'" class="banner">
+      您的账号正在等待管理员审核，审核通过后即可借书。
+    </p>
     <div class="toolbar">
       <input v-model="keyword" type="search" placeholder="书名 / 作者 / ISBN" @keyup.enter="search" />
       <button type="button" :disabled="loading" @click="search">搜索</button>
@@ -116,5 +123,12 @@ input[type='search'] {
 }
 .muted {
   color: #64748b;
+}
+.banner {
+  background: #fef3c7;
+  padding: 0.65rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
 }
 </style>

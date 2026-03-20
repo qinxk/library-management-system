@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { http } from '../api/http'
+import { apiErrorMessage } from '../api/errors'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
@@ -31,8 +32,8 @@ async function submit() {
     } else {
       await router.replace('/books')
     }
-  } catch {
-    error.value = '登录失败，请检查用户名和密码。'
+  } catch (e) {
+    error.value = apiErrorMessage(e, '登录失败，请检查用户名和密码。')
   } finally {
     submitting.value = false
   }

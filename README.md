@@ -46,6 +46,27 @@ Axios 实例见 `frontend/src/api/http.ts`（`baseURL: '/api'`，从 `localStora
 - 开发：继续用 Vite `5173` + 后端 `8080`。
 - 交付 jar：上述 `package` + `java -jar`。
 
+## 演示账号（仅本机开发）
+
+种子管理员来自 `backend/src/main/resources/application.yml` 中 **`app.seed`**（默认用户名 **`admin`**、密码 **`admin123456`**）。**切勿在生产环境使用该默认口令。**
+
+读者通过前端「注册」创建；初始为 **待审核**，管理员在 **`/admin/readers`** 通过后，`readerStatus` 为 **APPROVED** 方可借书。
+
+## 主要 API（前缀均为 `/api`）
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/books`，`/books/{id}` | 匿名馆藏分页/详情 |
+| POST | `/auth/register`，`/auth/login` | 注册（返回 JWT）、登录 |
+| GET | `/me` | 当前用户 `username` / `role` / `readerStatus` |
+| GET | `/me/loans` | 读者借阅列表 |
+| POST | `/loans`，`/loans/{id}/return` | 借书、还书（已审核读者） |
+| CRUD | `/admin/books` | 图书维护（管理员） |
+| GET/POST | `/admin/users/pending`，`.../{id}/approve|reject` | 待审核读者（管理员） |
+| GET | `/admin/loans` | 借阅总览（管理员） |
+
+业务错误体为 RFC7807 风格 JSON（含 `detail`、`code`、`fieldErrors` 等），前端见 `frontend/src/api/errors.ts`。
+
 ## 环境要求
 
 - JDK 17+
