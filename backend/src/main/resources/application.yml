@@ -21,3 +21,8 @@ spring:
 
 server:
   port: 8080
+
+app:
+  jwt:
+    secret: "replace-with-at-least-32-characters-demo-secret-key"
+    expiration-ms: 86400000
