@@ -29,3 +29,6 @@ app:
   seed:
     admin-username: admin
     admin-password: admin123456
+  library:
+    max-active-loans: 5
+    loan-days: 14
