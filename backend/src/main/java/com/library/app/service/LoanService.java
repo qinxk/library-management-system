@@ -11,6 +11,7 @@ import com.library.app.dto.LoanResponse;
 import com.library.app.repository.BookRepository;
 import com.library.app.repository.LoanRepository;
 import com.library.app.repository.UserRepository;
+import com.library.app.web.ConflictException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,14 +45,14 @@ public class LoanService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "BOOK_NOT_FOUND"));
 
 		if (book.getAvailableCopies() <= 0) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "NO_AVAILABLE_COPIES");
+			throw new ConflictException("NO_AVAILABLE_COPIES", "No copies available");
 		}
 		if (loanRepository.existsByReader_IdAndBook_IdAndReturnedAtIsNull(reader.getId(), bookId)) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "DUPLICATE_ACTIVE_LOAN");
+			throw new ConflictException("DUPLICATE_ACTIVE_LOAN", "Already borrowing this book");
 		}
 		long active = loanRepository.countByReader_IdAndReturnedAtIsNull(reader.getId());
 		if (active >= libraryProperties.getMaxActiveLoans()) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "MAX_ACTIVE_LOANS");
+			throw new ConflictException("MAX_ACTIVE_LOANS", "Active loan limit reached");
 		}
 
 		book.setAvailableCopies(book.getAvailableCopies() - 1);

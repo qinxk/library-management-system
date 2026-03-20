@@ -60,7 +60,19 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"exists\",\"password\":\"password123\"}"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("USERNAME_EXISTS"))
+                .andExpect(jsonPath("$.detail").value("Username already exists"));
+    }
+
+    @Test
+    void register_invalidRequest_returnsBadRequestWithFieldErrors() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"ab\",\"password\":\"short\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors").isArray())
+                .andExpect(jsonPath("$.detail").value("Validation failed"));
     }
 
     @Test

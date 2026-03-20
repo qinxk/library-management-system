@@ -121,7 +121,8 @@ class AdminBookControllerTest {
 
         mockMvc.perform(delete("/api/admin/books/{id}", book.getId())
                         .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("BOOK_HAS_ACTIVE_LOANS"));
     }
 
     @Autowired

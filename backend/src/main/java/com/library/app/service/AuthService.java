@@ -7,14 +7,13 @@ import com.library.app.dto.auth.LoginRequest;
 import com.library.app.dto.auth.RegisterRequest;
 import com.library.app.repository.UserRepository;
 import com.library.app.security.JwtService;
+import com.library.app.web.ConflictException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,7 @@ public class AuthService {
 
     public String register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            throw new ConflictException("USERNAME_EXISTS", "Username already exists");
         }
 
         User user = User.builder()

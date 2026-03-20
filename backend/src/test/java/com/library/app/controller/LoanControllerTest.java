@@ -111,7 +111,8 @@ class LoanControllerTest {
 						.header("Authorization", "Bearer " + token)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("{\"bookId\": " + book.getId() + "}"))
-				.andExpect(status().isConflict());
+				.andExpect(status().isConflict())
+				.andExpect(jsonPath("$.code").value("DUPLICATE_ACTIVE_LOAN"));
 	}
 
 	@Test
@@ -143,7 +144,8 @@ class LoanControllerTest {
 						.header("Authorization", "Bearer " + token)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("{\"bookId\": " + extra.getId() + "}"))
-				.andExpect(status().isConflict());
+				.andExpect(status().isConflict())
+				.andExpect(jsonPath("$.code").value("MAX_ACTIVE_LOANS"));
 	}
 
 	@Test

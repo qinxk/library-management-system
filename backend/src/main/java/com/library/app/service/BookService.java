@@ -5,6 +5,7 @@ import com.library.app.dto.book.AdminBookUpsertRequest;
 import com.library.app.dto.book.BookResponse;
 import com.library.app.repository.BookRepository;
 import com.library.app.repository.LoanRepository;
+import com.library.app.web.ConflictException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,7 +66,7 @@ public class BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
         if (loanRepository.existsByBookIdAndReturnedAtIsNull(id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Book has active loans");
+            throw new ConflictException("BOOK_HAS_ACTIVE_LOANS", "Book has active loans");
         }
         bookRepository.delete(book);
     }
