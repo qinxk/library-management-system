@@ -29,7 +29,9 @@ Spring Boot 后端 + Vue 3 前端。设计见 [`docs/plans/2026-03-20-library-ma
 
 浏览器打开 `http://localhost:5173`。接口路径统一为 `/api/...`。
 
-Axios 实例见 `frontend/src/api/http.ts`（`baseURL: '/api'`，从 `localStorage` 键 `library.jwt` 附带 `Authorization: Bearer`；登录态将由后续 Pinia store 写入同一键）。
+Axios 实例见 `frontend/src/api/http.ts`（`baseURL: '/api'`，从 `localStorage` 键 `library.jwt` 附带 `Authorization: Bearer`）。Pinia `stores/auth.ts` 在登录/注册后写入该键并调用 **`GET /api/me`** 同步角色与 `readerStatus`。
+
+前端路由（Vue Router）：`/` → 目录，`/login`、`/register`，`/books`、`/books/:id`，需读者登录的 `/me/loans`，管理员子路由 `/admin/books|readers|loans`。
 
 ## 单进程运行（Spring 托管 Vue 构建产物）
 

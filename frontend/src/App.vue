@@ -1,30 +1,74 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterLink, RouterView } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from './stores/auth'
+
+const auth = useAuthStore()
+const router = useRouter()
+
+function logout() {
+  auth.logout()
+  void router.push('/books')
+}
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+  <header class="top">
+    <RouterLink to="/books" class="brand">图书管理</RouterLink>
+    <nav>
+      <RouterLink to="/books">目录</RouterLink>
+      <RouterLink v-if="auth.isReader" to="/me/loans">我的借阅</RouterLink>
+      <RouterLink v-if="auth.isAdmin" to="/admin">管理后台</RouterLink>
+      <template v-if="!auth.isAuthenticated">
+        <RouterLink to="/login">登录</RouterLink>
+        <RouterLink to="/register">注册</RouterLink>
+      </template>
+      <template v-else>
+        <span class="who">{{ auth.user?.username }}</span>
+        <button type="button" class="link" @click="logout">退出</button>
+      </template>
+    </nav>
+  </header>
+  <RouterView />
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.brand {
+  font-weight: 700;
+  color: #0f172a;
+  text-decoration: none;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+nav {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 0.92rem;
+}
+nav a {
+  color: #2563eb;
+  text-decoration: none;
+}
+nav a.router-link-active {
+  font-weight: 600;
+}
+.who {
+  color: #64748b;
+  font-size: 0.88rem;
+}
+.link {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
 }
 </style>
