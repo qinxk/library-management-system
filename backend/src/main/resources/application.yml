@@ -1,4 +1,8 @@
 spring:
+  web:
+    resources:
+      # Single handler in SpaWebConfig (SPA fallback + /assets/**)
+      add-mappings: false
   application:
     name: library-backend
   datasource:
