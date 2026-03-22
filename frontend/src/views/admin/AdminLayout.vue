@@ -19,6 +19,7 @@ function logout() {
       <nav>
         <RouterLink to="/admin/books">图书</RouterLink>
         <RouterLink to="/admin/readers">待审核读者</RouterLink>
+        <RouterLink to="/admin/users">用户管理</RouterLink>
         <RouterLink to="/admin/loans">借阅总览</RouterLink>
       </nav>
       <p class="foot">

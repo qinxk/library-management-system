@@ -1,5 +1,7 @@
 package com.library.app.controller;
 
+import com.library.app.domain.User;
+import com.library.app.dto.user.ChangePasswordRequest;
 import com.library.app.dto.user.PendingReaderResponse;
 import com.library.app.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,5 +41,16 @@ public class AdminUserController {
     @ResponseStatus(NO_CONTENT)
     public void rejectReader(@PathVariable Long id) {
         adminUserService.rejectReader(id);
+    }
+
+    @PostMapping("/{id}/password")
+    @ResponseStatus(NO_CONTENT)
+    public void changePassword(@PathVariable Long id, @RequestBody ChangePasswordRequest request) {
+        adminUserService.changePassword(id, request);
+    }
+
+    @GetMapping
+    public List<User> listAllUsers() {
+        return adminUserService.listAllUsers();
     }
 }

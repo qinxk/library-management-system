@@ -3,10 +3,12 @@ package com.library.app.service;
 import com.library.app.domain.ReaderStatus;
 import com.library.app.domain.Role;
 import com.library.app.domain.User;
+import com.library.app.dto.user.ChangePasswordRequest;
 import com.library.app.dto.user.PendingReaderResponse;
 import com.library.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class AdminUserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<PendingReaderResponse> listPendingReaders() {
         return userRepository.findByRoleAndReaderStatusOrderByIdAsc(Role.READER, ReaderStatus.PENDING)
@@ -48,5 +51,16 @@ public class AdminUserService {
 
     private PendingReaderResponse toPendingReaderResponse(User user) {
         return new PendingReaderResponse(user.getId(), user.getUsername(), user.getReaderStatus());
+    }
+
+    public void changePassword(Long userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
+        userRepository.save(user);
+    }
+
+    public List<User> listAllUsers() {
+        return userRepository.findAll();
     }
 }
